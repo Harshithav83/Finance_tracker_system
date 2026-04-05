@@ -1,0 +1,107 @@
+{% extends 'transactions/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5>All Transactions</h5>
+        <a href="{% url 'transactions:transaction_create' %}" class="btn btn-success btn-sm">
+            <i class="fas fa-plus"></i> Add Transaction
+        </a>
+    </div>
+    <div class="card-body">
+        <!-- Filter Form -->
+        <form method="get" class="mb-4">
+            <div class="row">
+                <div class="col-md-2">
+                    <select name="type" class="form-control">
+                        <option value="">All Types</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="category" class="form-control" placeholder="Category">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="start_date" class="form-control" placeholder="Start Date">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="end_date" class="form-control" placeholder="End Date">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+                <div class="col-md-2">
+                    <a href="{% url 'transactions:transaction_list' %}" class="btn btn-secondary w-100">Clear</a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Transactions Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.date|date:"Y-m-d" }}</td>
+                        <td>
+                            <span class="badge {% if transaction.type == 'income' %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ transaction.type }}
+                            </span>
+                        </td>
+                        <td>{{ transaction.category }}</td>
+                        <td class="{% if transaction.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                            Rs.{{ transaction.amount|floatformat:2 }}
+                        </td>
+                        <td>{{ transaction.description|truncatechars:50 }}</td>
+                        <td>
+                            <a href="{% url 'transactions:transaction_edit' transaction.pk %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'transactions:transaction_delete' transaction.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No transactions found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if transactions.has_other_pages %}
+        <nav>
+            <ul class="pagination justify-content-center">
+                {% if transactions.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ transactions.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in transactions.paginator.page_range %}
+                    <li class="page-item {% if transactions.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                
+                {% if transactions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ transactions.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

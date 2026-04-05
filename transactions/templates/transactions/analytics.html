@@ -1,0 +1,142 @@
+{% extends 'transactions/base.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Total Income</h5>
+                <h2 class="card-text">Rs. {{ total_income|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Total Expenses</h5>
+                <h2 class="card-text">Rs. {{ total_expenses|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">Balance</h5>
+                <h2 class="card-text">Rs. {{ balance|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Category Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Total</th>
+                                <th>% of Expenses</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in category_data %}
+                            <tr>
+                                <td>{{ category.name }}</td>
+                                <td>Rs. {{ category.total|floatformat:2 }}</td>
+                                <td>{{ category.percentage|floatformat:1 }}%</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Monthly Trends</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Income</th>
+                                <th>Expenses</th>
+                                <th>Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, month in monthly_totals.items %}
+                            <tr>
+                                <td>{{ month.month }}</td>
+                                <td class="text-success">Rs. {{ month.income|floatformat:2 }}</td>
+                                <td class="text-danger">Rs. {{ month.expense|floatformat:2 }}</td>
+                                <td>Rs. {{ month.income|add:month.expense|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Summary Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="alert alert-info">
+                            <strong>Total Transactions</strong><br>
+                            {{ transaction_count }}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-success">
+                            <strong>Average Transaction</strong><br>
+                            Rs. {{ average_transaction|floatformat:2 }}
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-warning">
+                            <strong>Savings Rate</strong><br>
+                            {% widthratio balance total_income 100 %}%
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="alert alert-secondary">
+                            <strong>Export Data</strong><br>
+                            <a href="{% url 'transactions:export_csv' %}" class="btn btn-sm btn-primary">
+                                Download CSV
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
