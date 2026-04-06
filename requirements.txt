@@ -12,4 +12,3 @@ django-filter==23.5
 
 # Utilities
 python-decouple==3.8
-Pillow==10.1.0
